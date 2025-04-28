@@ -15,7 +15,6 @@
     <li><strong>Human &amp; Bot Players:</strong> Human players choose up to 6 tickets; bots automatically join with random ticket counts.</li>
     <li><strong>Real-Time Updates:</strong> Calls numbers, lines, and full house notifications broadcasted via SSE.</li>
     <li><strong>Web Interface:</strong> Responsive HTML/JS UI served from PROGMEM, showing ticket grids, called numbers, win popups, and game state.</li>
-    <li><strong>Connection Monitor:</strong> Separate page to view connected clients (MAC &amp; IP).</li>
   </ul>
 
   <h2>Prerequisites</h2>
