@@ -1,98 +1,121 @@
-ESP32 Bingo Game
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Bingo Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+    h1, h2 { color: #333; }
+    ul { margin: 0 0 1em 1.5em; }
+    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Bingo Game</h1>
+  <p>A web-based Bingo game hosted on an ESP32 microcontroller. Players (humans and bots) connect via Wi-Fi, join a lobby, receive randomized bingo tickets, and watch the game progress in real time through Server-Sent Events (SSE).</p>
 
-A web‑based Bingo game hosted on an ESP32 microcontroller. Players (humans and bots) connect via Wi‑Fi, join a lobby, receive randomized bingo tickets, and watch the game progress in real time through Server‑Sent Events (SSE).
+  <h2>Features</h2>
+  <ul>
+    <li><strong>Wi-Fi Access Point &amp; Station:</strong> ESP32 serves as both AP and station, with no power saving for reliable performance.</li>
+    <li><strong>Dynamic Ticket Generation:</strong> Perfect strips of 6 tickets generated server-side using <code>std::mt19937</code> seeded by <code>esp_random()</code>.</li>
+    <li><strong>Human &amp; Bot Players:</strong> Human players choose up to 6 tickets; bots automatically join with random ticket counts.</li>
+    <li><strong>Real-Time Updates:</strong> Calls numbers, lines, and full house notifications broadcasted via SSE.</li>
+    <li><strong>Web Interface:</strong> Responsive HTML/JS UI served from PROGMEM, showing ticket grids, called numbers, win popups, and game state.</li>
+    <li><strong>Connection Monitor:</strong> Separate page to view connected clients (MAC &amp; IP).</li>
+  </ul>
 
-Features
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><strong>Hardware:</strong> ESP32 development board.</li>
+    <li><strong>Software:</strong>
+      <ul>
+        <li>Arduino IDE or PlatformIO</li>
+        <li>ESP32 board support installed</li>
+        <li>Libraries:
+          <ul>
+            <li><code>WiFi.h</code></li>
+            <li><code>AsyncTCP.h</code></li>
+            <li><code>ESPAsyncWebServer.h</code></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
 
-Wi‑Fi Access Point & Station: ESP32 serves as both AP and station, with no power saving for reliable performance.
+  <h2>File Overview</h2>
+  <ul>
+    <li><code>.ino</code> / <code>.cpp</code>: Main application contains:
+      <ul>
+        <li>Ticket structure and <code>TicketGenerator</code> class</li>
+        <li>Wi-Fi setup and AP configuration</li>
+        <li>Async web server and SSE event source</li>
+        <li>Game logic: lobby, countdown, draw loop, win detection</li>
+        <li>HTML/CSS/JS pages in PROGMEM for game UI and connections page</li>
+      </ul>
+    </li>
+    <li><strong>TicketGenerator</strong> (<code>TicketGenerator</code> class)
+      <ul>
+        <li>Pools numbers into 9 columns (1–9, 10–19, … 80–90)</li>
+        <li>Builds strips of 6 tickets with exactly 15 numbers each (5 per row)</li>
+        <li>Ensures balanced distribution</li>
+      </ul>
+    </li>
+    <li><strong>Web Interface</strong> (embedded HTML)
+      <ul>
+        <li><code>mainPageHtml</code>: Bingo game interface</li>
+        <li><code>connectionsPageHtml</code>: Table of connected clients</li>
+        <li>Client-side JS handles:
+          <ul>
+            <li>Joining lobby and requesting tickets</li>
+            <li>Rendering ticket cards and marking called numbers</li>
+            <li>Displaying countdown and game progress</li>
+            <li>Pop-up notifications for 1-line, 2-lines, and full house wins</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
 
-Dynamic Ticket Generation: Perfect strips of 6 tickets generated server‑side using std::mt19937 seeded by esp_random().
+  <h2>Installation &amp; Usage</h2>
+  <ol>
+    <li><strong>Clone the repository:</strong>
+      <pre><code>git clone https://github.com/your-username/esp32-bingo.git
+cd esp32-bingo</code></pre>
+    </li>
+    <li>Open project in Arduino IDE or PlatformIO.</li>
+    <li>Configure Wi-Fi (optional): modify <code>ssid</code> and <code>password</code> variables (defaults to open AP).</li>
+    <li>Install dependencies: use Library Manager to install <code>AsyncTCP</code> and <code>ESPAsyncWebServer</code>.</li>
+    <li>Upload to ESP32.</li>
+    <li>Connect:
+      <ul>
+        <li>Join the Wi-Fi network <code>Wifi Bingo</code>.</li>
+        <li>Navigate to <code>http://192.168.4.1/</code> for the bingo game.</li>
+        <li>To view connections, go to <code>http://192.168.4.1/connections</code>.</li>
+      </ul>
+    </li>
+  </ol>
 
-Human & Bot Players: Human players choose up to 6 tickets; bots automatically join with random ticket counts.
+  <h2>Code Highlights</h2>
+  <pre><code>// Generate a unique ticket from a perfect strip:
+Ticket generateUniqueTicket() {
+  return TicketGenerator::nextTicket();
+}
 
-Real‑Time Updates: Calls numbers, lines, and full house notifications broadcasted via SSE.
+// Notify all clients via SSE:
+void notifyAllClients(const String& msg) {
+  events.send(msg.c_str(), nullptr, millis());
+  // store history for replay...
+}
 
-Web Interface: Responsive HTML/JS UI served from PROGMEM, showing ticket grids, called numbers, win popups, and game state.
+// Draw numbers every 3 seconds once game starts:
+if (gameStarted && millis() - lastDraw > 3000) {
+  drawNextNumber();
+  lastDraw = millis();
+}</code></pre>
 
-Connection Monitor: Separate page to view connected clients (MAC & IP).
-
-Prerequisites
-
-Hardware: ESP32 development board.
-
-Software:
-
-Arduino IDE or PlatformIO
-
-ESP32 board support installed
-
-Libraries:
-
-WiFi.h
-
-AsyncTCP.h
-
-ESPAsyncWebServer.h
-
-File Overview
-
-.ino / .cpp: Main application contains:
-
-Ticket structure and TicketGenerator class
-
-Wi‑Fi setup and AP configuration
-
-Async web server and SSE event source
-
-Game logic: lobby, countdown, draw loop, win detection
-
-HTML/CSS/JS pages in PROGMEM for game UI and connections page
-
-TicketGenerator (TicketGenerator class)
-
-Pools numbers into 9 columns (1–9, 10–19, … 80–90)
-
-Builds strips of 6 tickets with exactly 15 numbers each (5 per row)
-
-Ensures balanced distribution
-
-Web Interface (embedded HTML)
-
-mainPageHtml: Bingo game interface
-
-connectionsPageHtml: Table of connected clients
-
-Client‑side JS handles:
-
-Joining lobby and requesting tickets
-
-Rendering ticket cards and marking called numbers
-
-Displaying countdown and game progress
-
-Pop‑up notifications for 1‑line, 2‑lines, and full house wins
-
-Installation & Usage
-
-Clone the repository:
-
-git clone https://github.com/your‑username/esp32‑bingo.git
-cd esp32‑bingo
-
-Open project in Arduino IDE or PlatformIO.
-
-Configure Wi‑Fi (optional):
-
-Modify ssid and password variables (defaults to open AP).
-
-Install dependencies:
-
-In Arduino IDE: use Library Manager to install AsyncTCP and ESPAsyncWebServer.
-
-Upload to ESP32.
-
-Connect:
-
-Join the Wi‑Fi network Wifi Bingo.
-
-Navigate to http://192.168.4.1/ for the bingo game.
+  <h2>License</h2>
+  <p>This project is licensed under the MIT License. See <a href="LICENSE">LICENSE</a> file for details.</p>
+</body>
+</html>
