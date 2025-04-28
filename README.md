@@ -4,13 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ESP32 Bingo Game</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
-    h1, h2 { color: #333; }
-    ul { margin: 0 0 1em 1.5em; }
-    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
-    pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
-  </style>
 </head>
 <body>
   <h1>ESP32 Bingo Game</h1>
@@ -92,30 +85,11 @@ cd esp32-bingo</code></pre>
       <ul>
         <li>Join the Wi-Fi network <code>Wifi Bingo</code>.</li>
         <li>Navigate to <code>http://192.168.4.1/</code> for the bingo game.</li>
-        <li>To view connections, go to <code>http://192.168.4.1/connections</code>.</li>
       </ul>
     </li>
   </ol>
 
-  <h2>Code Highlights</h2>
-  <pre><code>// Generate a unique ticket from a perfect strip:
-Ticket generateUniqueTicket() {
-  return TicketGenerator::nextTicket();
-}
 
-// Notify all clients via SSE:
-void notifyAllClients(const String& msg) {
-  events.send(msg.c_str(), nullptr, millis());
-  // store history for replay...
-}
 
-// Draw numbers every 3 seconds once game starts:
-if (gameStarted && millis() - lastDraw > 3000) {
-  drawNextNumber();
-  lastDraw = millis();
-}</code></pre>
-
-  <h2>License</h2>
-  <p>This project is licensed under the MIT License. See <a href="LICENSE">LICENSE</a> file for details.</p>
 </body>
 </html>
