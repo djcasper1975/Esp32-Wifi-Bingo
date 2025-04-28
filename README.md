@@ -56,7 +56,6 @@
     <li><strong>Web Interface</strong> (embedded HTML)
       <ul>
         <li><code>mainPageHtml</code>: Bingo game interface</li>
-        <li><code>connectionsPageHtml</code>: Table of connected clients</li>
         <li>Client-side JS handles:
           <ul>
             <li>Joining lobby and requesting tickets</li>
