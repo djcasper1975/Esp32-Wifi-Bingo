@@ -6,7 +6,7 @@
 </head>
 <body>
   <h1>ESP32 Bingo Game</h1>
-  <p>A web-based Bingo game hosted on an ESP32 microcontroller. Players (humans and bots) connect via Wi-Fi, join a lobby, receive randomized bingo tickets, and watch the game progress in real time through Server-Sent Events (SSE).</p>
+  <p>A wifi web-based Bingo game hosted on an ESP32 microcontroller. Players (humans and bots) connect via Wi-Fi, join a lobby, receive randomized bingo tickets, and watch the game progress in real time through Server-Sent Events (SSE).</p>
 
   <h2>Features</h2>
   <ul>
