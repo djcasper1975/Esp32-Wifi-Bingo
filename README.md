@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP32 Bingo Game</title>
 </head>
 <body>
   <h1>ESP32 Bingo Game</h1>
