@@ -74,7 +74,7 @@
 <br>
   <ol>
     <li><strong>Clone the repository:</strong>
-      <pre><code>git clone https://github.com/your-username/esp32-bingo.git
+      <pre><code>git clone https://github.com/djcasper1975/esp32-bingo.git
 cd esp32-bingo</code></pre>
     </li>
     <li>Open project in Arduino IDE or PlatformIO.</li>
