@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
+#include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <vector>
 #include <map>
@@ -15,6 +16,9 @@
 #include <lwip/inet.h>
 #include <lwip/sockets.h>
 #include <pgmspace.h>     //  <-- add for PROGMEM
+
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
 
 //--------------------------------------------------------------------------
 // Ticket structure
@@ -833,17 +837,23 @@ const char connectionsPageHtml[] PROGMEM = R"rawliteral(
 
 void setup() {
   Serial.begin(115200);
+
   WiFi.mode(WIFI_AP_STA);
   esp_wifi_set_ps(WIFI_PS_NONE);
   WiFi.softAP(ssid, password);
   Serial.print("Bingo AP started, IP = ");
   Serial.println(WiFi.softAPIP());
 
+  // Start DNS server to resolve all domains to ESP32 AP IP
+  dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+
   initializeBots();
 
+  // Regular routes
   server.on("/", HTTP_GET, [](AsyncWebServerRequest* req){
     req->send_P(200, "text/html", mainPageHtml);
   });
+
   server.on("/game_status", HTTP_GET, [](AsyncWebServerRequest* req){
     unsigned long elapsed = countdownStarted ? millis() - countdownStartTime : 0;
     int rem = countdownStarted ? max(0, int((countdownDuration - elapsed)/1000)) : 0;
@@ -856,6 +866,7 @@ void setup() {
                "}";
     req->send(200, "application/json", s);
   });
+
   server.on("/get_ticket", HTTP_GET, [](AsyncWebServerRequest* req){
     if (gameStarted) {
       req->send(403, "text/plain", "Game in progress.");
@@ -875,6 +886,7 @@ void setup() {
     notifyAllClients("PLAYERCOUNT:" + String(players.size()));
     if (!countdownStarted) startCountdown();
   });
+
   server.on("/player_state", HTTP_GET, [](AsyncWebServerRequest* req){
     String ip = req->client()->remoteIP().toString();
     auto it = players.find(ip);
@@ -903,15 +915,37 @@ void setup() {
     json += "]}";
     req->send(200, "application/json", json);
   });
+
   server.on("/connections", HTTP_GET, [](AsyncWebServerRequest* req){
     req->send_P(200, "text/html", connectionsPageHtml);
+  });
+
+  // Captive portal detection handlers
+  server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest* req){ req->redirect("/"); });
+  server.on("/gen_204", HTTP_GET, [](AsyncWebServerRequest* req){ req->redirect("/"); });
+  server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest* req){ req->redirect("/"); });
+  server.on("/library/test/success.html", HTTP_GET, [](AsyncWebServerRequest* req){ req->redirect("/"); });
+  server.on("/ncsi.txt", HTTP_GET, [](AsyncWebServerRequest* req){ req->send(200, "text/plain", "Microsoft NCSI"); });
+  server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest* req){ req->send(200, "text/plain", "Microsoft Connect Test"); });
+  server.on("/redirect", HTTP_GET, [](AsyncWebServerRequest* req){ req->redirect("/"); });
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* req){ req->send(204); });  // prevent 404 spam
+
+  // Catch-all: redirect .com domains or serve main page
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    if (request->host().endsWith(".com")) {
+      request->redirect("/");
+      return;
+    }
+    request->send_P(200, "text/html", mainPageHtml);
   });
 
   server.addHandler(&events);
   server.begin();
 }
 
+
 void loop() {
+  dnsServer.processNextRequest();
   if (fullHouseHappened) {
     if (millis() - fullHouseRevealStart >= fullHouseRevealDuration) {
       endGame();
