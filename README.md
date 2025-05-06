@@ -69,9 +69,8 @@
   </ul>
 
   <h2>Installation &amp; Usage</h2>
-  <li></li>
-  <a href="https://djcasper1975.github.io/Esp32-Wifi-Bingo/flash.html" style="display:inline-block;padding:10px 20px;background:#007bff;color:white;text-decoration:none;border-radius:4px;">Click here to install/flash</a>
-  <li></li>
+  <li></li><a href="https://djcasper1975.github.io/Esp32-Wifi-Bingo/flash.html" style="display:inline-block;padding:10px 20px;background:#007bff;color:white;text-decoration:none;border-radius:4px;">Click here to install/flash</a></li>
+
   <ol>
     <li><strong>Clone the repository:</strong>
       <pre><code>git clone https://github.com/your-username/esp32-bingo.git
