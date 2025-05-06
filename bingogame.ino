@@ -840,6 +840,7 @@ void setup() {
 
   WiFi.mode(WIFI_AP_STA);
   esp_wifi_set_ps(WIFI_PS_NONE);
+  esp_wifi_set_max_tx_power(78); // <-- set max Wi-Fi power
   WiFi.softAP(ssid, password);
   Serial.print("Bingo AP started, IP = ");
   Serial.println(WiFi.softAPIP());
