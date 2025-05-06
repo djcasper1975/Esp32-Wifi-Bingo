@@ -84,6 +84,7 @@ cd esp32-bingo</code></pre>
       <ul>
         <li>Join the Wi-Fi network <code>Wifi Bingo</code>.</li>
         <li>Navigate to <code>http://192.168.4.1/</code> for the bingo game.</li>
+        <li>Or type any domain i.e <code>bingo.com / anything.com</code> and this works too.</li>
       </ul>
     </li>
   </ol>
